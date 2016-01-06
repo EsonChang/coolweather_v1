@@ -11,25 +11,30 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-
 /**
  * 通过单例模式，获取唯一数据库实例
  * 
  * @author EsonChang
  */
-
 public class CoolWeatherDB {
+	/**
+	 * 数据库名
+	 */
 	public static final String DB_NAME = "cool_weather";
-
+	/**
+	 * 数据库版本
+	 */
 	private static final int VERSION = 1;
 	private static CoolWeatherDB coolWeatherDB;
 	private SQLiteDatabase db;
 
-	public CoolWeatherDB(Context context) {
+	private CoolWeatherDB(Context context) {
 		CoolWeatherOpenHelper dbHelper = new CoolWeatherOpenHelper(context, DB_NAME, null, VERSION);
-		dbHelper.getWritableDatabase();
+		db = dbHelper.getWritableDatabase();
 	}
-
+	/**
+	 * 获取CoolWeatherDB的实例。
+	 */
 	public synchronized static CoolWeatherDB getInstance(Context context) {
 		if (coolWeatherDB == null) {
 			coolWeatherDB = new CoolWeatherDB(context);
@@ -45,16 +50,16 @@ public class CoolWeatherDB {
 			ContentValues values = new ContentValues();
 			values.put("province_name", province.getProvinceName());
 			values.put("province_code", province.getProvinceCode());
-			db.insert("province", null, values);
+			db.insert("Province", null, values);
 		}
 	}
 
 	/**
 	 * 从数据库读取所有省份信息。
 	 */
-	public List<Province> loadProvince() {
+	public List<Province> loadProvinces() {
 		List<Province> list = new ArrayList<Province>();
-		Cursor cursor = db.query("province", null, null, null, null, null, null);
+		Cursor cursor = db.query("Province", null, null, null, null, null, null);
 		if (cursor.moveToFirst()) {
 			do {
 				Province province = new Province();
@@ -76,14 +81,14 @@ public class CoolWeatherDB {
 			values.put("city_name", city.getCityName());
 			values.put("city_code", city.getCityCode());
 			values.put("province_id", city.getProvinceId());
-			db.insert("city", null, values);
+			db.insert("City", null, values);
 		}
 	}
 
 	/**
-	 * 从数据库读取某省下所有的城市信息。
+	 * 从数据库读取某省下所有城市信息。
 	 */
-	public List<City> loadCity(int provinceId) {
+	public List<City> loadCities(int provinceId) {
 		List<City> list = new ArrayList<City>();
 		Cursor cursor = db.query("City", null, null, null, null, null, null);
 		if (cursor.moveToFirst()) {
@@ -108,14 +113,14 @@ public class CoolWeatherDB {
 			values.put("county_name", county.getCountyName());
 			values.put("county_code", county.getCountyCode());
 			values.put("city_id", county.getCityId());
-			db.insert("county", null, values);
+			db.insert("County", null, values);
 		}
 	}
 
 	/**
 	 * 从数据库读取某市下所有的县信息。
 	 */
-	public List<County> loadCounty(int cityId) {
+	public List<County> loadCounties(int cityId) {
 		List<County> list = new ArrayList<County>();
 		Cursor cursor = db.query("County", null, null, null, null, null, null);
 		if (cursor.moveToFirst()) {
@@ -130,5 +135,4 @@ public class CoolWeatherDB {
 		}
 		return list;
 	}
-
 }
